@@ -1,0 +1,134 @@
+import android.content.res.ColorStateList
+import android.text.format.DateUtils
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.*
+
+class OrderAdapter(
+    private var orders: List<Order>,
+    private val onOrderClick: (Order) -> Unit
+) : RecyclerView.Adapter<OrderAdapter.OrderViewHolder>() {
+
+    private var filteredOrders: List<Order> = orders
+
+    class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvOrderNumber: TextView = view.findViewById(R.id.tvOrderNumber)
+        val chipStatus: Chip = view.findViewById(R.id.chipStatus)
+        val tvCustomerName: TextView = view.findViewById(R.id.tvCustomerName)
+        val tvCustomerPhone: TextView = view.findViewById(R.id.tvCustomerPhone)
+        val tvAddress: TextView = view.findViewById(R.id.tvAddress)
+        val tvItemsCount: TextView = view.findViewById(R.id.tvItemsCount)
+        val tvDate: TextView = view.findViewById(R.id.tvDate)
+        val tvTotalAmount: TextView = view.findViewById(R.id.tvTotalAmount)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_order, parent, false)
+        return OrderViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
+        val order = filteredOrders[position]
+        
+        // Número de orden
+        holder.tvOrderNumber.text = "Orden #${order.orderNumber}"
+        
+        // Estado
+        holder.chipStatus.apply {
+            text = order.status.displayName
+            chipBackgroundColor = ColorStateList.valueOf(
+                ContextCompat.getColor(context, order.status.colorRes)
+            )
+        }
+        
+        // Información del cliente
+        holder.tvCustomerName.text = order.customerName
+        holder.tvCustomerPhone.text = order.customerPhone ?: "Sin teléfono"
+        holder.tvAddress.text = order.address ?: "Sin dirección registrada"
+        
+        // Cantidad de items
+        val itemsText = if (order.items.size == 1) {
+            "1 servicio"
+        } else {
+            "${order.items.size} servicios"
+        }
+        holder.tvItemsCount.text = itemsText
+        
+        // Fecha
+        holder.tvDate.text = formatDate(order.createdAt)
+        
+        // Total
+        holder.tvTotalAmount.text = formatCurrency(order.totalAmount)
+        
+        // Click listener
+        holder.itemView.setOnClickListener {
+            onOrderClick(order)
+        }
+    }
+
+    override fun getItemCount() = filteredOrders.size
+
+    private fun formatDate(timestamp: Long): String {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        return dateFormat.format(Date(timestamp))
+    }
+
+    private fun formatCurrency(amount: Double): String {
+        val format = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
+        return format.format(amount)
+    }
+
+    // Filtrar por búsqueda
+    fun filter(query: String) {
+        filteredOrders = if (query.isEmpty()) {
+            orders
+        } else {
+            orders.filter {
+                it.orderNumber.contains(query, ignoreCase = true) ||
+                it.customerName.contains(query, ignoreCase = true)
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    // Filtrar por estado
+    fun filterByStatus(status: OrderStatus?) {
+        filteredOrders = if (status == null) {
+            orders
+        } else {
+            orders.filter { it.status == status }
+        }
+        notifyDataSetChanged()
+    }
+
+    // Actualizar lista de órdenes
+    fun updateOrders(newOrders: List<Order>) {
+        orders = newOrders
+        filteredOrders = newOrders
+        notifyDataSetChanged()
+    }
+
+    // Ordenar órdenes
+    fun sortOrders(sortType: SortType) {
+        orders = when (sortType) {
+            SortType.DATE_DESC -> orders.sortedByDescending { it.createdAt }
+            SortType.DATE_ASC -> orders.sortedBy { it.createdAt }
+            SortType.AMOUNT_DESC -> orders.sortedByDescending { it.totalAmount }
+            SortType.AMOUNT_ASC -> orders.sortedBy { it.totalAmount }
+        }
+        filteredOrders = orders
+        notifyDataSetChanged()
+    }
+
+    enum class SortType {
+        DATE_DESC, DATE_ASC, AMOUNT_DESC, AMOUNT_ASC
+    }
+}
