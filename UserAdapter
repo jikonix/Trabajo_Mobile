@@ -1,0 +1,83 @@
+class UserAdapter(
+    private var users: List<User>,
+    private val onUserClick: (User) -> Unit
+) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
+
+    private var filteredUsers: List<User> = users
+
+    class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvInitials: TextView = view.findViewById(R.id.tvInitials)
+        val tvName: TextView = view.findViewById(R.id.tvUserName)
+        val tvEmail: TextView = view.findViewById(R.id.tvUserEmail)
+        val tvPhone: TextView = view.findViewById(R.id.tvUserPhone)
+        val chipRole: Chip = view.findViewById(R.id.chipRole)
+        val statusIndicator: View = view.findViewById(R.id.statusIndicator)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_user, parent, false)
+        return UserViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        val user = filteredUsers[position]
+        
+        // Iniciales
+        holder.tvInitials.text = getInitials(user.name)
+        
+        // Datos del usuario
+        holder.tvName.text = user.name
+        holder.tvEmail.text = user.email
+        holder.tvPhone.text = user.phone ?: "Sin teléfono"
+        
+        // Rol
+        holder.chipRole.text = user.role
+        holder.chipRole.setChipBackgroundColorResource(
+            if (user.role == "ADMIN") R.color.purple_500 else R.color.teal_700
+        )
+        
+        // Estado
+        holder.statusIndicator.backgroundTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(
+                holder.itemView.context,
+                if (user.isActive) android.R.color.holo_green_dark 
+                else android.R.color.holo_red_dark
+            )
+        )
+        
+        // Click listener
+        holder.itemView.setOnClickListener {
+            onUserClick(user)
+        }
+    }
+
+    override fun getItemCount() = filteredUsers.size
+
+    private fun getInitials(name: String): String {
+        val parts = name.trim().split(" ")
+        return if (parts.size >= 2) {
+            "${parts[0].first().uppercaseChar()}${parts[1].first().uppercaseChar()}"
+        } else {
+            parts[0].take(2).uppercase()
+        }
+    }
+
+    fun filter(query: String) {
+        filteredUsers = if (query.isEmpty()) {
+            users
+        } else {
+            users.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                it.email.contains(query, ignoreCase = true)
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    fun updateUsers(newUsers: List<User>) {
+        users = newUsers
+        filteredUsers = newUsers
+        notifyDataSetChanged()
+    }
+}
