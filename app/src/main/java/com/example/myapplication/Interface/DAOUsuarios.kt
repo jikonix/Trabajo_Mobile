@@ -21,6 +21,6 @@ interface DAOUsuarios {
     fun obtenerUsuarios(): Flow<List<Usuario>>
 
     @Query("update Usuarios set numero=:numero, rol=:rol,run=:run, nombre=:nombre, password = :password where correo = :correo")
-    suspend fun updateUsuario(correo: String,password: String,run: String,nombre: String, numero: Number, rol: Boolean)
+    suspend fun updateUsuario(correo: String,password: String,run: String,nombre: String, numero: Int, rol: Boolean)
 
 }
