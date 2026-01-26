@@ -9,6 +9,6 @@ data class Usuario (
     var password: String,
     var run: String,
     var nombre: String,
-    var numero: Int,
+    var numero: String,
     var rol: Boolean
 )

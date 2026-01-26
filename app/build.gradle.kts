@@ -68,4 +68,10 @@ dependencies {
 
     // Lifecycle runtime
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+
+    // Navigation Compose
+    implementation("androidx.navigation:navigation-compose:2.9.6")
+
+    // Material Icons Extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 }
