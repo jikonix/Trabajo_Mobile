@@ -3,7 +3,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.myapplication.Model.Servicio
-import com.example.myapplication.Model.Usuario
 import kotlinx.coroutines.flow.Flow
 @Dao
 interface DAOServicios {
@@ -13,8 +12,9 @@ interface DAOServicios {
     @Query("delete from Servicios where id = :id")
     suspend fun deleteServicio(id: Int)
 
-    @Query("select * from Usuarios")
-    fun obtenerServicios(): Flow<List<Usuario>>
+
+    @Query("select * from Servicios")
+    fun obtenerServicios(): Flow<List<Servicio>>
 
     @Query("update Servicios set nombre=:nombre, comentarios=:comentarios, precio =:precio  where id = :id ")
     suspend fun updateServicio(id:Int,nombre: String, comentarios: String, precio:Double)
