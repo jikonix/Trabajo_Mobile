@@ -8,11 +8,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.myapplication.Interface.DAOUsuarios
 import com.example.myapplication.Model.Usuario
-@Database(entities=[Usuario::class],version=1)
+import com.example.myapplication.Interface.DAOServicios
+import com.example.myapplication.Model.Servicio
+import com.example.myapplication.Interface.DAOSolicitudes
+import com.example.myapplication.Model.Solicitud
+
+@Database(entities = [Usuario::class, Servicio::class, Solicitud::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun usuarioDao(): DAOUsuarios
-
+    abstract fun servicioDao(): DAOServicios
+    abstract fun solicitudDao(): DAOSolicitudes
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
