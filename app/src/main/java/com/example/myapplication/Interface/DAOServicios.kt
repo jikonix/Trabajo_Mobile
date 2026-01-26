@@ -18,4 +18,5 @@ interface DAOServicios {
 
     @Query("update Servicios set nombre=:nombre, comentarios=:comentarios, precio =:precio  where id = :id ")
     suspend fun updateServicio(id:Int,nombre: String, comentarios: String, precio:Double)
+    //revisar si quedo bien
 }
