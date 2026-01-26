@@ -12,7 +12,7 @@ interface DAOUsuarios {
     suspend fun insert(usuario:Usuario)
 
     @Query("SELECT * FROM Usuarios WHERE correo = :correo and password = :password")
-    suspend fun login(correo: String, password: String): Usuario
+    suspend fun login(correo: String, password: String): Usuario?
 
     @Query("delete from Usuarios where correo = :correo")
     suspend fun deleteUser(correo:String)
@@ -21,6 +21,6 @@ interface DAOUsuarios {
     fun obtenerUsuarios(): Flow<List<Usuario>>
 
     @Query("update Usuarios set numero=:numero, rol=:rol,run=:run, nombre=:nombre, password = :password where correo = :correo")
-    suspend fun updateUsuario(correo: String,password: String,run: String,nombre: String, numero: Number, rol: Boolean)
+    suspend fun updateUsuario(correo: String,password: String,run: String,nombre: String, numero: String, rol: Boolean)
 
 }
