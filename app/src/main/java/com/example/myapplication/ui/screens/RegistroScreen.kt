@@ -29,9 +29,18 @@ fun RegistroScreen(navController: NavController, usuarioViewModel: UsuarioViewMo
     var correoError by remember { mutableStateOf<String?>(null) }
     var numeroError by remember { mutableStateOf<String?>(null) }
 
-    val isFormValid by derivedStateOf {
-        nombre.isNotBlank() && run.isNotBlank() && correo.isNotBlank() && numero.isNotBlank() && password.isNotBlank() &&
-                nombreError == null && runError == null && correoError == null && numeroError == null
+    val isFormValid by remember {
+        derivedStateOf {
+            nombre.isNotBlank() &&
+                    run.isNotBlank() &&
+                    correo.isNotBlank() &&
+                    numero.isNotBlank() &&
+                    password.isNotBlank() &&
+                    nombreError == null &&
+                    runError == null &&
+                    correoError == null &&
+                    numeroError == null
+        }
     }
 
     Box(
