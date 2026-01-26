@@ -10,7 +10,7 @@ class UsuarioViewModel(app: Application) : AndroidViewModel(app) {
     private val usuarioDAO = AppDatabase.getDatabase(app).usuarioDao()
     val usuarios = usuarioDAO.obtenerUsuarios()
 
-    fun insertarUsuario(correo: String,password: String,run: String,nombre: String, numero: Number, rol: Boolean) = viewModelScope.launch {
+    fun insertarUsuario(correo: String,password: String,run: String,nombre: String, numero: Int, rol: Boolean) = viewModelScope.launch {
         val user = Usuario(correo,password,run,nombre,numero,rol)
         usuarioDAO.insert(user)
     }
@@ -20,7 +20,7 @@ class UsuarioViewModel(app: Application) : AndroidViewModel(app) {
     fun deleteUser(correo: String) = viewModelScope.launch {
         usuarioDAO.deleteUser(correo)
     }
-    fun updateUsuario(correo: String,password: String,run: String,nombre: String, numero: Number, rol: Boolean) = viewModelScope.launch {
+    fun updateUsuario(correo: String,password: String,run: String,nombre: String, numero: Int, rol: Boolean) = viewModelScope.launch {
         usuarioDAO.updateUsuario(correo,password,run,nombre,numero,rol)
     }
 }
