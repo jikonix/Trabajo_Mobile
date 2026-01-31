@@ -1,27 +1,31 @@
 package com.example.myapplication.Viewmodel
 
-
-import com.example.myapplication.repository.AppDatabase
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.Model.Servicio
+import com.example.myapplication.repository.AppDatabase
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class ServicioViewModel(app: Application) : AndroidViewModel(app) {
-    private val servicioDAO = AppDatabase.getDatabase(app).servicioDao()
-    val servicios = servicioDAO.obtenerServicios()
+class ServicioViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun ingresarServicio(id: Int,nombre: String, comentarios: String, precio: Double) = viewModelScope.launch {
-        val user = Servicio(id,nombre, comentarios, precio)
-        servicioDAO.ingresarServicio(user)
+    private val servicioDao = AppDatabase.getDatabase(application).servicioDao()
+
+    val todosLosServicios: Flow<List<Servicio>> = servicioDao.getAllServicios()
+
+    fun insertarServicio(nombre: String, precio: Double) {
+        if (nombre.isNotBlank() && precio > 0) {
+            viewModelScope.launch {
+                val nuevoServicio = Servicio(nombre = nombre, precio = precio)
+                servicioDao.insertServicio(nuevoServicio)
+            }
+        }
     }
-    fun deleteServicio(id: Int) = viewModelScope.launch {
-        servicioDAO.deleteServicio(id)
-    }
 
-
-    fun updateServicio(id: Int, nombre: String, comentarios: String, precio: Double) = viewModelScope.launch {
-        servicioDAO.updateServicio(id,nombre, comentarios, precio)
+    fun eliminarServicio(servicioId: Int) {
+        viewModelScope.launch {
+            servicioDao.deleteServicio(servicioId)
+        }
     }
 }
