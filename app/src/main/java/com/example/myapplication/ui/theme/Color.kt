@@ -2,19 +2,22 @@ package com.example.myapplication.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Paleta de colores principal
-val PrimaryBlue = Color(0xFF007BFF)
-val PrimaryVariantBlue = Color(0xFF0056b3)
-val SecondaryBlue = Color(0xFF6c757d)
+// Nueva paleta de colores inspirada en el diseño
+val DarkPurple = Color(0xFF1A1A2E)
+val NeonGreen = Color(0xFF00F5D4)
+val LightLavender = Color(0xFFB1A2F5)
+val PureWhite = Color(0xFFFFFFFF)
+val OffWhite = Color(0xFFE0E0E0)
+val SubtleGray = Color(0xFF4A4A6A)
 
-// Colores de fondo y superficie
-val Background = Color(0xFFF4F7F9)
-val Surface = Color(0xFFFFFFFF)
-val OnSurface = Color(0xFF121212)
-
-// Colores para texto
-val TextPrimary = Color(0xFF212529)
-val TextSecondary = Color(0xFF6c757d)
-
-// Colores de error y éxito
-val ErrorRed = Color(0xFFDC3545)
+// Paleta de colores principal (redefinida)
+val Primary = NeonGreen
+val PrimaryVariant = Color(0xFF00BFA5)
+val Secondary = LightLavender
+val Background = DarkPurple
+val Surface = Color(0xFF232340) // Un poco más claro que el fondo
+val OnPrimary = DarkPurple
+val OnSecondary = DarkPurple
+val OnBackground = PureWhite
+val OnSurface = OffWhite
+val ErrorRed = Color(0xFFFF5252)
