@@ -1,51 +1,93 @@
-package com.example.myapplication.ViewModel
+package com.example.myapplication.Viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.Model.Servicio
 import com.example.myapplication.Model.Solicitud
-import com.example.myapplication.Model.SolicitudConDetalle // Importante: La clase combinada
+import com.example.myapplication.Model.SolicitudConDetalle
 import com.example.myapplication.repository.AppDatabase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
-class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
+class SolicitudViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val solicitudDao = AppDatabase.getDatabase(app).solicitudDao()
+    private val solicitudDao = AppDatabase.getDatabase(application).solicitudDao()
+    private val servicioDao = AppDatabase.getDatabase(application).servicioDao()
 
+    val todosLosServicios: Flow<List<Servicio>> = servicioDao.getAllServicios()
 
-    fun obtenerHistorial(correoCliente: String): Flow<List<SolicitudConDetalle>> {
-        return solicitudDao.obtenerSolicitudesPorUsuario(correoCliente)
+    // --- Lógica para solicitudes de un usuario específico ---
+    private val _correoUsuario = MutableStateFlow<String?>(null)
+    val solicitudesDelUsuario: Flow<List<SolicitudConDetalle>> = _correoUsuario.flatMapLatest { correo ->
+        if (correo != null) {
+            solicitudDao.obtenerSolicitudesPorUsuario(correo)
+        } else {
+            MutableStateFlow(emptyList())
+        }
     }
 
-    fun guardarSolicitud(
-        correo: String,
-        fecha: String,
-        auto: String,
-        patente: String,
-        servicioId: Int, // Recibimos el ID, pero en la lista mostraremos el Nombre gracias al JOIN
-        estado: String = "Pendiente"
-    ) {
+    // --- Lógica para todas las solicitudes (admin) y horas ocupadas ---
+    private val _selectedDate = MutableStateFlow<String?>(null)
+    val todasLasSolicitudes: Flow<List<SolicitudConDetalle>> = solicitudDao.getAllSolicitudes()
+    val horasOcupadas: Flow<List<String>> = _selectedDate.flatMapLatest { date ->
+        if (date != null) {
+            solicitudDao.getHorasOcupadasPorFecha(date)
+        } else {
+            MutableStateFlow(emptyList())
+        }
+    }
+
+    private val _solicitudEnEdicion = MutableStateFlow<Solicitud?>(null)
+    val solicitudEnEdicion = _solicitudEnEdicion.asStateFlow()
+
+    fun cargarSolicitudesDe(correo: String) {
+        _correoUsuario.value = correo
+    }
+
+    fun onDateSelected(fecha: String) {
+        _selectedDate.value = fecha
+    }
+
+    fun cargarSolicitudParaEdicion(solicitudId: Int) {
+        viewModelScope.launch {
+            _solicitudEnEdicion.value = solicitudDao.getSolicitudById(solicitudId)
+        }
+    }
+
+    fun crearSolicitud(correoUsuario: String, auto: String, patente: String, servicioId: Int, fecha: String, hora: String) {
         viewModelScope.launch {
             val nuevaSolicitud = Solicitud(
-                correo = correo,
+                correo = correoUsuario,
                 fecha = fecha,
+                hora = hora,
                 auto = auto,
                 patente = patente,
                 servicioid = servicioId,
-                estado = estado
+                estado = "Ingresada"
             )
-
             solicitudDao.insertSolicitud(nuevaSolicitud)
         }
     }
 
-    fun eliminarSolicitud(id: Int) = viewModelScope.launch {
-        solicitudDao.deleteSolicitudPorId(id)
+    fun actualizarSolicitud(solicitud: Solicitud) {
+        viewModelScope.launch {
+            solicitudDao.updateSolicitud(solicitud)
+        }
     }
 
-    // actualizar estado
-    fun actualizarEstadoSolicitud(id: Int, nuevoEstado: String) = viewModelScope.launch {
-        solicitudDao.actualizarEstado(id, nuevoEstado)
+    fun cancelarSolicitud(solicitudId: Int) {
+        viewModelScope.launch {
+            solicitudDao.deleteSolicitudPorId(solicitudId)
+        }
+    }
+
+    fun actualizarEstado(solicitudId: Int, nuevoEstado: String) {
+        viewModelScope.launch {
+            solicitudDao.actualizarEstado(solicitudId, nuevoEstado)
+        }
     }
 }

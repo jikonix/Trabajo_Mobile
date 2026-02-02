@@ -1,11 +1,15 @@
 package com.example.myapplication.Model
 
 import androidx.room.Embedded
+import androidx.room.Relation
 
 data class SolicitudConDetalle(
-    // Trae todos los campos de la tabla Solicitud
-    @Embedded val solicitud: Solicitud,
+    @Embedded
+    val solicitud: Solicitud,
 
-    // Campo extra que viene del JOIN con la tabla Servicios
-    val nombreServicio: String
+    @Relation(
+        parentColumn = "servicioid",
+        entityColumn = "id"
+    )
+    val servicio: Servicio
 )
