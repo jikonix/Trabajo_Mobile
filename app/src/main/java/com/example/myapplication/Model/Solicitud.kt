@@ -4,7 +4,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "Solicitudes")
 data class Solicitud (
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     val id:Int=0,
     val correo:String,
     val fecha: String,
