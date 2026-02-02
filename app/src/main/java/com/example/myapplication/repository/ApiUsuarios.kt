@@ -8,8 +8,8 @@ class ApiUsuarios {
 
     }
     //Obtener un usuario por su nombre de usuario
-    suspend fun obtenerUsuario(username: String): Response<Usuario> {
-        return RetrofitClient.apiService.getUser(username)
+    suspend fun obtenerUsuario(correo: String): Response<Usuario> {
+        return RetrofitClient.apiService.getUser(correo)
     }
 
     //Agregar un usuario
@@ -18,12 +18,12 @@ class ApiUsuarios {
     }
 
     //Eliminar un usuari
-    suspend fun eliminarUsuario(username: String): Response<Usuario> {
-        return RetrofitClient.apiService.deleteUser(username)
+    suspend fun eliminarUsuario(correo: String): Response<Usuario> {
+        return RetrofitClient.apiService.deleteUser(correo)
     }
 
     //Actualizar un usuario
-    suspend fun actualizarUsuario(username: String, usuario: Usuario): Response<Usuario> {
-        return RetrofitClient.apiService.updateUser(username, usuario)
+    suspend fun actualizarUsuario(correo: String, usuario: Usuario): Response<Usuario> {
+        return RetrofitClient.apiService.updateUser(correo, usuario)
     }
 }
